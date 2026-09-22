@@ -1,0 +1,664 @@
+{
+  "info": {
+    "name": "InstaWash Laundry - Campus Ecosystem API",
+    "description": "Complete Postman Collection for InstaWash Laundry Campus Ecosystem APIs featuring Dynamic Role & Permission Management, Unified Login (/api/auth/login), and Manual Logout (/api/auth/logout).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5050/api",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "managerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "receptionistToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountantToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Unified Authentication & Logout APIs",
+      "item": [
+        {
+          "name": "Unified Login - Super Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"instawash_admin\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Unified Login - Outlet Manager",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"OM001\",\n  \"password\": \"Manager@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Unified Login - Receptionist",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"REC001\",\n  \"password\": \"Reception@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Unified Login - Accountant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"ACC001\",\n  \"password\": \"Accountant@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Unified Login - Student (Mobile OTP)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Manual Logout (Invalidate Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        },
+        {
+          "name": "Get Profile & Dynamic Sidebar Modules (/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Super Admin Panel APIs (Roles & Permissions)",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/dashboard", "host": ["{{baseUrl}}"], "path": ["superadmin", "dashboard"] }
+          }
+        },
+        {
+          "name": "Get All System Feature Permissions Registry",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/permissions", "host": ["{{baseUrl}}"], "path": ["superadmin", "permissions"] }
+          }
+        },
+        {
+          "name": "Get Specific User Assigned Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/users/usr_rec_1/permissions", "host": ["{{baseUrl}}"], "path": ["superadmin", "users", "usr_rec_1", "permissions"] }
+          }
+        },
+        {
+          "name": "Dynamically Update User Permissions & Modules ON/OFF",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": [\"orders\", \"students\"],\n  \"maxDiscountPercent\": 15.0,\n  \"isActive\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/users/usr_rec_1/permissions", "host": ["{{baseUrl}}"], "path": ["superadmin", "users", "usr_rec_1", "permissions"] }
+          }
+        },
+        {
+          "name": "Create Outlet Manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"staffId\": \"OM002\",\n  \"name\": \"Vikas Mehta\",\n  \"email\": \"vikas@instawash.com\",\n  \"phone\": \"9811199988\",\n  \"password\": \"Manager@123\",\n  \"outletId\": \"out_main_01\",\n  \"permissions\": [\"dashboard\", \"receptionists\", \"orders\", \"machines\", \"reports\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/outlet-managers", "host": ["{{baseUrl}}"], "path": ["superadmin", "outlet-managers"] }
+          }
+        },
+        {
+          "name": "List Outlet Managers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/outlet-managers", "host": ["{{baseUrl}}"], "path": ["superadmin", "outlet-managers"] }
+          }
+        },
+        {
+          "name": "Create Accountant",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"staffId\": \"ACC002\",\n  \"name\": \"Ramesh Sharma\",\n  \"email\": \"ramesh@instawash.com\",\n  \"phone\": \"9822299988\",\n  \"password\": \"Accountant@123\",\n  \"outletIds\": [\"out_main_01\"],\n  \"maxDiscountPercent\": 15.0,\n  \"permissions\": [\"dashboard\", \"plans\", \"expenses\", \"collections\", \"reports\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/accountants", "host": ["{{baseUrl}}"], "path": ["superadmin", "accountants"] }
+          }
+        },
+        {
+          "name": "List Accountants",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/accountants", "host": ["{{baseUrl}}"], "path": ["superadmin", "accountants"] }
+          }
+        },
+        {
+          "name": "Create Campus",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"North IIT Campus\",\n  \"address\": \"Sector 4, Academic Block\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/campuses", "host": ["{{baseUrl}}"], "path": ["superadmin", "campuses"] }
+          }
+        },
+        {
+          "name": "List Campuses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/campuses", "host": ["{{baseUrl}}"], "path": ["superadmin", "campuses"] }
+          }
+        },
+        {
+          "name": "Create Outlet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campusId\": \"cmp_main_01\",\n  \"name\": \"North Hostel Block Outlet\",\n  \"address\": \"Near Boys Mess 2\",\n  \"latitude\": 28.536,\n  \"longitude\": 77.392,\n  \"hasBoysSection\": true,\n  \"hasGirlsSection\": false\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/outlets", "host": ["{{baseUrl}}"], "path": ["superadmin", "outlets"] }
+          }
+        },
+        {
+          "name": "List Outlets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/outlets", "host": ["{{baseUrl}}"], "path": ["superadmin", "outlets"] }
+          }
+        },
+        {
+          "name": "Create Subscription Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Premium 50KG Plan\",\n  \"quotaKg\": 50.0,\n  \"cycleDays\": 30,\n  \"price\": 800.0,\n  \"paygRatePerKg\": 45.0,\n  \"minBillingUnitKg\": 5.0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/plans", "host": ["{{baseUrl}}"], "path": ["superadmin", "plans"] }
+          }
+        },
+        {
+          "name": "List Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/plans", "host": ["{{baseUrl}}"], "path": ["superadmin", "plans"] }
+          }
+        },
+        {
+          "name": "Get Network Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/reports", "host": ["{{baseUrl}}"], "path": ["superadmin", "reports"] }
+          }
+        },
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/audit-logs", "host": ["{{baseUrl}}"], "path": ["superadmin", "audit-logs"] }
+          }
+        },
+        {
+          "name": "Publish Notice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Diwali Holiday Schedule\",\n  \"content\": \"All outlets will close at 5 PM on festival day.\",\n  \"targetType\": \"ALL_STUDENTS\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/notices", "host": ["{{baseUrl}}"], "path": ["superadmin", "notices"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Outlet Manager Panel APIs",
+      "item": [
+        {
+          "name": "Get Outlet Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/dashboard", "host": ["{{baseUrl}}"], "path": ["manager", "dashboard"] }
+          }
+        },
+        {
+          "name": "Create Receptionist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"staffId\": \"REC002\",\n  \"name\": \"Pooja Sharma\",\n  \"email\": \"pooja@instawash.com\",\n  \"phone\": \"9811133344\",\n  \"password\": \"Reception@123\",\n  \"section\": \"GIRLS\",\n  \"shift\": \"Evening\",\n  \"maxDiscountPercent\": 10.0,\n  \"permissions\": [\"orders\", \"students\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/manager/receptionists", "host": ["{{baseUrl}}"], "path": ["manager", "receptionists"] }
+          }
+        },
+        {
+          "name": "List Receptionists",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/receptionists", "host": ["{{baseUrl}}"], "path": ["manager", "receptionists"] }
+          }
+        },
+        {
+          "name": "Get Flagged Orders",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/flagged-orders", "host": ["{{baseUrl}}"], "path": ["manager", "flagged-orders"] }
+          }
+        },
+        {
+          "name": "Resolve Flagged Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolutionNotes\": \"Missing shirt located and delivered to student room.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/manager/flagged-orders/flg_sample_id/resolve", "host": ["{{baseUrl}}"], "path": ["manager", "flagged-orders", "flg_sample_id", "resolve"] }
+          }
+        },
+        {
+          "name": "List Machines",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/machines", "host": ["{{baseUrl}}"], "path": ["manager", "machines"] }
+          }
+        },
+        {
+          "name": "Create Machine",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machineCode\": \"DRY-02\",\n  \"capacityKg\": 10.0,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/manager/machines", "host": ["{{baseUrl}}"], "path": ["manager", "machines"] }
+          }
+        },
+        {
+          "name": "Get Operational Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": { "raw": "{{baseUrl}}/manager/reports", "host": ["{{baseUrl}}"], "path": ["manager", "reports"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Receptionist Panel APIs",
+      "item": [
+        {
+          "name": "Register New Student by Receptionist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{receptionistToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876500999\",\n  \"fullName\": \"Mohit Verma\",\n  \"studentIdCard\": \"STU202699\",\n  \"gender\": \"MALE\",\n  \"hostelName\": \"Hostel C\",\n  \"roomNumber\": \"305\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/receptionist/students", "host": ["{{baseUrl}}"], "path": ["receptionist", "students"] }
+          }
+        },
+        {
+          "name": "Search Student (by Phone/ID/QR)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{receptionistToken}}" }],
+            "url": { "raw": "{{baseUrl}}/receptionist/students/search?query=9876543210", "host": ["{{baseUrl}}"], "path": ["receptionist", "students", "search"], "query": [{ "key": "query", "value": "9876543210" }] }
+          }
+        },
+        {
+          "name": "Scan Student Permanent QR",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{receptionistToken}}" }],
+            "url": { "raw": "{{baseUrl}}/receptionist/students/qr/INSTAWASH:STUDENT:STD001:1fb35493", "host": ["{{baseUrl}}"], "path": ["receptionist", "students", "qr", "INSTAWASH:STUDENT:STD001:1fb35493"] }
+          }
+        },
+        {
+          "name": "Drop-Off Item Intake",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{receptionistToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"stu_01\",\n  \"pieceCount\": 7,\n  \"weightKg\": 6.5,\n  \"washType\": \"Wash & Fold\",\n  \"withIron\": false,\n  \"itemCondition\": \"Good\",\n  \"discountPercent\": 5.0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/receptionist/orders/intake", "host": ["{{baseUrl}}"], "path": ["receptionist", "orders", "intake"] }
+          }
+        },
+        {
+          "name": "Update Order Status (RECEIVED -> IN_WASH -> READY -> COLLECTED)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{receptionistToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_WASH\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/receptionist/orders/ord_sample_id/status", "host": ["{{baseUrl}}"], "path": ["receptionist", "orders", "ord_sample_id", "status"] }
+          }
+        },
+        {
+          "name": "Daily Activity Log",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{receptionistToken}}" }],
+            "url": { "raw": "{{baseUrl}}/receptionist/activity-log", "host": ["{{baseUrl}}"], "path": ["receptionist", "activity-log"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Accountant Panel APIs",
+      "item": [
+        {
+          "name": "Get Billing Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accountantToken}}" }],
+            "url": { "raw": "{{baseUrl}}/accountant/billing-dashboard", "host": ["{{baseUrl}}"], "path": ["accountant", "billing-dashboard"] }
+          }
+        },
+        {
+          "name": "Confirm & Record Subscription Payment (Activates Plan)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accountantToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"stu_01\",\n  \"planId\": \"plan_01\",\n  \"amount\": 500.0,\n  \"paymentMode\": \"UPI\",\n  \"paymentReference\": \"UPI-TXN-11223344\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/accountant/subscriptions/confirm-payment", "host": ["{{baseUrl}}"], "path": ["accountant", "subscriptions", "confirm-payment"] }
+          }
+        },
+        {
+          "name": "Calculate PAYG Billing Preview (5KG Min Billing Unit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accountantToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remainingQuotaKg\": 2.0,\n  \"intakeWeightKg\": 8.0,\n  \"paygRatePerKg\": 50.0,\n  \"minBillingUnitKg\": 5.0,\n  \"discountPercent\": 10.0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/accountant/payg/calculate", "host": ["{{baseUrl}}"], "path": ["accountant", "payg", "calculate"] }
+          }
+        },
+        {
+          "name": "Get Daily Outlet Collections",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accountantToken}}" }],
+            "url": { "raw": "{{baseUrl}}/accountant/collections", "host": ["{{baseUrl}}"], "path": ["accountant", "collections"] }
+          }
+        },
+        {
+          "name": "Reconcile & Confirm Daily Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accountantToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"out_main_01\",\n  \"date\": \"2026-09-22\",\n  \"cashAmount\": 1500.0,\n  \"upiAmount\": 3500.0,\n  \"cardAmount\": 1000.0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/accountant/collections/confirm", "host": ["{{baseUrl}}"], "path": ["accountant", "collections", "confirm"] }
+          }
+        },
+        {
+          "name": "Record Expense",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accountantToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"out_main_01\",\n  \"category\": \"Detergent & Supplies\",\n  \"amount\": 1200.0,\n  \"description\": \"Purchased 20KG Ariel Liquid Detergent\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/accountant/expenses", "host": ["{{baseUrl}}"], "path": ["accountant", "expenses"] }
+          }
+        },
+        {
+          "name": "Get Financial Statements",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accountantToken}}" }],
+            "url": { "raw": "{{baseUrl}}/accountant/financial-statements", "host": ["{{baseUrl}}"], "path": ["accountant", "financial-statements"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Student Mobile App APIs",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9812345678\",\n  \"fullName\": \"Rohan Das\",\n  \"gender\": \"MALE\",\n  \"campusId\": \"cmp_main_01\",\n  \"studentIdCard\": \"STU-2026-202\",\n  \"gradYear\": 2028,\n  \"course\": \"Mechanical Engineering\",\n  \"hostelName\": \"Hostel Block 3\",\n  \"roomNumber\": \"C-102\",\n  \"email\": \"rohan@student.edu\",\n  \"password\": \"Student@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/student/register", "host": ["{{baseUrl}}"], "path": ["student", "register"] }
+          }
+        },
+        {
+          "name": "Get Student Profile & QR Code Data URL",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/student/profile", "host": ["{{baseUrl}}"], "path": ["student", "profile"] }
+          }
+        },
+        {
+          "name": "Select Subscription Plan (Pay at Outlet)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"plan_01\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/student/subscriptions/select", "host": ["{{baseUrl}}"], "path": ["student", "subscriptions", "select"] }
+          }
+        },
+        {
+          "name": "Get Student Home Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/student/dashboard", "host": ["{{baseUrl}}"], "path": ["student", "dashboard"] }
+          }
+        },
+        {
+          "name": "Get Student My Orders",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/student/orders", "host": ["{{baseUrl}}"], "path": ["student", "orders"] }
+          }
+        },
+        {
+          "name": "Raise Complaint (Missing item/Delay/Damage)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ord_sample_id\",\n  \"type\": \"MISSING_ITEM\",\n  \"description\": \"One blue shirt was missing from today's collection.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/student/complaints", "host": ["{{baseUrl}}"], "path": ["student", "complaints"] }
+          }
+        },
+        {
+          "name": "Rate Outlet After Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ord_sample_id\",\n  \"score\": 5,\n  \"comment\": \"Great service and fast turnaround!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/student/ratings", "host": ["{{baseUrl}}"], "path": ["student", "ratings"] }
+          }
+        },
+        {
+          "name": "Get Notices",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": { "raw": "{{baseUrl}}/student/notices", "host": ["{{baseUrl}}"], "path": ["student", "notices"] }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaWash Laundry — Campus Ecosystem API & Portal Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --secondary: #818cf8;
+      --accent: #f43f5e;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.15) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .logo-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #ffffff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--success);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(30, 41, 59, 0.5);
+      padding: 0.4rem;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+
+    pre {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      color: #a5f3fc;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 350px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .qr-container {
+      text-align: center;
+      padding: 1rem;
+      background: #ffffff;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .qr-container img {
+      width: 180px;
+      height: 180px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--card-border);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-box">
+      <div class="logo-icon">IW</div>
+      <div class="logo-text">
+        <h1>InstaWash Laundry</h1>
+        <p>Unified Role-Based API & Admin Portal</p>
+      </div>
+    </div>
+    <div class="badge-status">
+      <div class="dot"></div>
+      Single Unified Login API Active (/api/auth/login)
+    </div>
+  </header>
+
+  <main>
+    <!-- Nav Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('superadmin')">1. Super Admin Panel</button>
+      <button class="tab-btn" onclick="switchTab('manager')">2. Outlet Manager Panel</button>
+      <button class="tab-btn" onclick="switchTab('receptionist')">3. Receptionist Panel</button>
+      <button class="tab-btn" onclick="switchTab('accountant')">4. Accountant Panel</button>
+      <button class="tab-btn" onclick="switchTab('student')">5. Student Mobile App API</button>
+    </div>
+
+    <!-- 1. SUPER ADMIN TAB -->
+    <div id="tab-superadmin" class="tab-content active">
+      <div class="grid-3" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Unified Login - Super Admin</div>
+          <div class="form-group">
+            <label>Admin ID / Email / Phone</label>
+            <input type="text" id="sa-loginId" value="instawash_admin">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="sa-password" value="Admin@123">
+          </div>
+          <button class="btn" onclick="loginRole('superadmin', 'sa-loginId', 'sa-password', 'sa-response-log')">Login via Unified API (/api/auth/login)</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Network Metrics</div>
+          <div>Total Outlets: <span id="stat-outlets" class="stat-number">1</span></div>
+          <div>Total Subscriptions: <span id="stat-subs" class="stat-number">1</span></div>
+          <div>Network Revenue: <span id="stat-rev" class="stat-number">₹500</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Super Admin Actions</div>
+          <button class="btn btn-secondary" onclick="fetchSADashboard()" style="margin-bottom: 0.5rem;">Refresh Dashboard Stats</button>
+          <button class="btn btn-secondary" onclick="fetchAuditLogs()" style="margin-bottom: 0.5rem;">View System Audit Logs</button>
+          <button class="btn btn-secondary" onclick="fetchNetworkReports()">View Network Reports</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Create Outlet Manager Account</div>
+          <div class="form-group"><label>Staff ID</label><input type="text" id="om-staffId" value="OM002"></div>
+          <div class="form-group"><label>Name</label><input type="text" id="om-name" value="Vikas Mehta"></div>
+          <div class="form-group"><label>Email</label><input type="text" id="om-email" value="vikas@instawash.com"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="om-pass" value="Manager@123"></div>
+          <button class="btn" onclick="createOutletManager()">Create Outlet Manager Account</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">API Response Terminal</div>
+          <pre id="sa-response-log">// Login or execute actions to see live JSON responses...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. OUTLET MANAGER TAB -->
+    <div id="tab-manager" class="tab-content">
+      <div class="grid-2" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Unified Login - Outlet Manager</div>
+          <div class="form-group"><label>Staff ID / Email / Phone</label><input type="text" id="mgr-staffId" value="OM001"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="mgr-password" value="Manager@123"></div>
+          <button class="btn" onclick="loginRole('manager', 'mgr-staffId', 'mgr-password', 'mgr-response-log')">Login via Unified API (/api/auth/login)</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Outlet Dashboard Overview</div>
+          <div id="mgr-dash-info">Login to view pending, in-process, ready, and flagged orders for your outlet.</div>
+          <button class="btn btn-secondary" onclick="fetchManagerDashboard()" style="margin-top: 1rem;">Load Outlet Dashboard</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Create Receptionist Account (Own Outlet)</div>
+          <div class="form-group"><label>Staff ID</label><input type="text" id="rec-staffId" value="REC002"></div>
+          <div class="form-group"><label>Name</label><input type="text" id="rec-name" value="Pooja Sharma"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="rec-pass" value="Reception@123"></div>
+          <div class="form-group">
+            <label>Section</label>
+            <select id="rec-section"><option value="BOYS">Boys Section</option><option value="GIRLS">Girls Section</option></select>
+          </div>
+          <div class="form-group"><label>Max Discount %</label><input type="number" id="rec-disc" value="10"></div>
+          <button class="btn" onclick="createReceptionist()">Create Receptionist Account</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Manager Terminal Log</div>
+          <pre id="mgr-response-log">// Manager API output will appear here...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. RECEPTIONIST PANEL TAB -->
+    <div id="tab-receptionist" class="tab-content">
+      <div class="grid-2" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Unified Login - Receptionist</div>
+          <div class="form-group"><label>Staff ID / Email / Phone</label><input type="text" id="rcp-login-id" value="REC001"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="rcp-login-pass" value="Reception@123"></div>
+          <button class="btn" onclick="loginRole('receptionist', 'rcp-login-id', 'rcp-login-pass', 'rcp-response-log')">Login via Unified API (/api/auth/login)</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Search Student / Permanent QR Scan</div>
+          <div class="form-group"><label>Student Phone Number / Sub ID / QR Code Token</label><input type="text" id="rcp-search-query" value="9876543210"></div>
+          <button class="btn" onclick="searchStudent()">Search Student</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Item Intake at Drop-Off</div>
+          <div class="form-group"><label>Student ID</label><input type="text" id="intake-studentId" placeholder="Click search to auto-fill student ID"></div>
+          <div class="form-group"><label>Piece Count</label><input type="number" id="intake-pieces" value="6"></div>
+          <div class="form-group"><label>Weight in KG</label><input type="number" step="0.5" id="intake-weight" value="8.0"></div>
+          <div class="form-group">
+            <label>Wash Type</label>
+            <select id="intake-wash"><option value="Wash & Fold">Wash & Fold</option><option value="Wash & Iron">Wash & Iron</option><option value="Dry Clean">Dry Clean</option></select>
+          </div>
+          <div class="form-group"><label>PAYG Discount % (Ceiling Enforced)</label><input type="number" id="intake-discount" value="5"></div>
+          <button class="btn" onclick="submitOrderIntake()">Record Drop-Off Intake</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Receptionist Terminal Log</div>
+          <pre id="rcp-response-log">// Receptionist intake output...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ACCOUNTANT PANEL TAB -->
+    <div id="tab-accountant" class="tab-content">
+      <div class="grid-2" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Unified Login - Accountant</div>
+          <div class="form-group"><label>Staff ID / Email / Phone</label><input type="text" id="acc-login-id" value="ACC001"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="acc-login-pass" value="Accountant@123"></div>
+          <button class="btn" onclick="loginRole('accountant', 'acc-login-id', 'acc-login-pass', 'acc-response-log')">Login via Unified API (/api/auth/login)</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Accountant Billing & Reconciliation</div>
+          <button class="btn btn-secondary" onclick="fetchBillingDashboard()" style="margin-bottom: 0.5rem;">View Billing Dashboard</button>
+          <button class="btn btn-secondary" onclick="fetchFinancialStatements()">Generate Financial Statement</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Daily Outlet Collection Confirmation</div>
+          <div class="form-group"><label>Date (YYYY-MM-DD)</label><input type="text" id="col-date" value="2026-09-22"></div>
+          <div class="form-group"><label>Cash Collection (₹)</label><input type="number" id="col-cash" value="1500"></div>
+          <div class="form-group"><label>UPI Collection (₹)</label><input type="number" id="col-upi" value="3500"></div>
+          <div class="form-group"><label>Card Collection (₹)</label><input type="number" id="col-card" value="1000"></div>
+          <button class="btn" onclick="confirmDailyCollection()">Reconcile & Confirm Collection</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Accountant Terminal Log</div>
+          <pre id="acc-response-log">// Accountant logs will appear here...</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. STUDENT MOBILE APP TAB -->
+    <div id="tab-student" class="tab-content">
+      <div class="grid-2" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Unified Login - Student (OTP / Password)</div>
+          <div class="form-group"><label>Mobile / Email / Roll Number</label><input type="text" id="stu-mobile" value="9876543210"></div>
+          <div class="form-group"><label>OTP (123456) OR Password</label><input type="text" id="stu-otp" value="123456"></div>
+          <button class="btn" onclick="loginStudent()">Unified Login (/api/auth/login)</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Student Home Dashboard</div>
+          <div id="stu-dashboard-card">Click "Load Student Dashboard" after login to display live status & permanent QR code.</div>
+          <button class="btn btn-secondary" onclick="fetchStudentDashboard()" style="margin-top: 1rem;">Load Student Dashboard</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Permanent Student QR Code</div>
+          <div id="stu-qr-display" style="text-align: center;">
+            <p style="color: var(--text-muted);">Login as student to view your permanent QR code.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Student Terminal Log</div>
+          <pre id="stu-response-log">// Student mobile API logs...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Founder Code Technology Pvt. Ltd. — InstaWash Laundry Ecosystem Backend</p>
+  </footer>
+
+  <script>
+    let tokens = {
+      superadmin: '',
+      manager: '',
+      receptionist: '',
+      accountant: '',
+      student: ''
+    };
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    async function apiRequest(endpoint, method = 'GET', body = null, token = '') {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const options = { method, headers };
+      if (body) options.body = JSON.stringify(body);
+
+      const res = await fetch(`/api${endpoint}`, options);
+      return await res.json();
+    }
+
+    // Unified Login Handler for All Roles
+    async function loginRole(roleKey, idElemId, passElemId, logElemId) {
+      const identifier = document.getElementById(idElemId).value;
+      const password = document.getElementById(passElemId).value;
+
+      const data = await apiRequest('/auth/login', 'POST', { identifier, password });
+      document.getElementById(logElemId).textContent = JSON.stringify(data, null, 2);
+
+      if (data.success) {
+        tokens[roleKey] = data.data.token;
+        alert(`Logged in successfully as ${data.data.role}!`);
+      }
+    }
+
+    // Super Admin Actions
+    async function fetchSADashboard() {
+      if (!tokens.superadmin) return alert('Please login as Super Admin first');
+      const data = await apiRequest('/superadmin/dashboard', 'GET', null, tokens.superadmin);
+      document.getElementById('sa-response-log').textContent = JSON.stringify(data, null, 2);
+
+      if (data.success) {
+        document.getElementById('stat-outlets').textContent = data.data.totalOutlets;
+        document.getElementById('stat-subs').textContent = data.data.totalSubscriptions;
+        document.getElementById('stat-rev').textContent = `₹${data.data.totalRevenue}`;
+      }
+    }
+
+    async function createOutletManager() {
+      if (!tokens.superadmin) return alert('Please login as Super Admin first');
+      const body = {
+        staffId: document.getElementById('om-staffId').value,
+        name: document.getElementById('om-name').value,
+        email: document.getElementById('om-email').value,
+        password: document.getElementById('om-pass').value,
+        outletId: 'out_main_01'
+      };
+      const data = await apiRequest('/superadmin/outlet-managers', 'POST', body, tokens.superadmin);
+      document.getElementById('sa-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function fetchAuditLogs() {
+      if (!tokens.superadmin) return alert('Please login as Super Admin first');
+      const data = await apiRequest('/superadmin/audit-logs', 'GET', null, tokens.superadmin);
+      document.getElementById('sa-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function fetchNetworkReports() {
+      if (!tokens.superadmin) return alert('Please login as Super Admin first');
+      const data = await apiRequest('/superadmin/reports', 'GET', null, tokens.superadmin);
+      document.getElementById('sa-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Manager Functions
+    async function fetchManagerDashboard() {
+      if (!tokens.manager) return alert('Please login as Outlet Manager first');
+      const data = await apiRequest('/manager/dashboard', 'GET', null, tokens.manager);
+      document.getElementById('mgr-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function createReceptionist() {
+      if (!tokens.manager) return alert('Please login as Outlet Manager first');
+      const body = {
+        staffId: document.getElementById('rec-staffId').value,
+        name: document.getElementById('rec-name').value,
+        password: document.getElementById('rec-pass').value,
+        section: document.getElementById('rec-section').value,
+        maxDiscountPercent: document.getElementById('rec-disc').value
+      };
+      const data = await apiRequest('/manager/receptionists', 'POST', body, tokens.manager);
+      document.getElementById('mgr-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Receptionist Functions
+    async function searchStudent() {
+      if (!tokens.receptionist) return alert('Please login as Receptionist first');
+      const query = document.getElementById('rcp-search-query').value;
+      const data = await apiRequest(`/receptionist/students/search?query=${query}`, 'GET', null, tokens.receptionist);
+      document.getElementById('rcp-response-log').textContent = JSON.stringify(data, null, 2);
+
+      if (data.success && data.data.length > 0) {
+        document.getElementById('intake-studentId').value = data.data[0].id;
+      }
+    }
+
+    async function submitOrderIntake() {
+      if (!tokens.receptionist) return alert('Please login as Receptionist first');
+      const body = {
+        studentId: document.getElementById('intake-studentId').value,
+        pieceCount: document.getElementById('intake-pieces').value,
+        weightKg: document.getElementById('intake-weight').value,
+        washType: document.getElementById('intake-wash').value,
+        discountPercent: document.getElementById('intake-discount').value
+      };
+      const data = await apiRequest('/receptionist/orders/intake', 'POST', body, tokens.receptionist);
+      document.getElementById('rcp-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Accountant Functions
+    async function fetchBillingDashboard() {
+      if (!tokens.accountant) return alert('Please login as Accountant first');
+      const data = await apiRequest('/accountant/billing-dashboard', 'GET', null, tokens.accountant);
+      document.getElementById('acc-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function confirmDailyCollection() {
+      if (!tokens.accountant) return alert('Please login as Accountant first');
+      const body = {
+        outletId: 'out_main_01',
+        date: document.getElementById('col-date').value,
+        cashAmount: document.getElementById('col-cash').value,
+        upiAmount: document.getElementById('col-upi').value,
+        cardAmount: document.getElementById('col-card').value
+      };
+      const data = await apiRequest('/accountant/collections/confirm', 'POST', body, tokens.accountant);
+      document.getElementById('acc-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function fetchFinancialStatements() {
+      if (!tokens.accountant) return alert('Please login as Accountant first');
+      const data = await apiRequest('/accountant/financial-statements', 'GET', null, tokens.accountant);
+      document.getElementById('acc-response-log').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Student Functions
+    async function loginStudent() {
+      const identifier = document.getElementById('stu-mobile').value;
+      const otpVal = document.getElementById('stu-otp').value;
+
+      const body = otpVal === '123456' ? { identifier, otp: otpVal } : { identifier, password: otpVal };
+      const data = await apiRequest('/auth/login', 'POST', body);
+      document.getElementById('stu-response-log').textContent = JSON.stringify(data, null, 2);
+
+      if (data.success && data.data.token) {
+        tokens.student = data.data.token;
+        alert('Student logged in via Unified Login API!');
+        fetchStudentDashboard();
+      }
+    }
+
+    async function fetchStudentDashboard() {
+      if (!tokens.student) return alert('Please login as Student first');
+      const data = await apiRequest('/student/dashboard', 'GET', null, tokens.student);
+      document.getElementById('stu-response-log').textContent = JSON.stringify(data, null, 2);
+
+      if (data.success) {
+        const d = data.data;
+        document.getElementById('stu-dashboard-card').innerHTML = `
+          <div><strong>Student Name:</strong> ${d.studentName}</div>
+          <div><strong>Current Plan:</strong> ${d.currentPlan}</div>
+          <div><strong>Remaining Quota:</strong> ${d.remainingQuotaKg} KG / ${d.totalQuotaKg} KG</div>
+          <div><strong>Outlet:</strong> ${d.outletName}</div>
+        `;
+        if (d.qrDataUrl) {
+          document.getElementById('stu-qr-display').innerHTML = `
+            <div class="qr-container">
+              <img src="${d.qrDataUrl}" alt="Permanent Student QR">
+              <p style="color: #333; font-weight: 600; margin-top: 0.5rem;">${d.permanentQr}</p>
+            </div>
+          `;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
