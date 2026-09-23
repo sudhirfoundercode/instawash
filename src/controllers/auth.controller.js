@@ -76,21 +76,6 @@ const unifiedLogin = async (req, res) => {
         role: user.role,
         token,
         sessionExpiryInfo: 'Session automatically expires after inactivity window (default 2 hours)',
-        permissions: permissionModules,
-        sidebarModules,
-        user: {
-          id: user.id,
-          staffId: user.staff_id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          section: user.section,
-          shift: user.shift,
-          maxDiscountPercent: user.max_discount_percent,
-          permissions: permissionModules,
-          outlets: userOutlets,
-        },
       });
     }
 
@@ -118,15 +103,6 @@ const unifiedLogin = async (req, res) => {
         return errorResponse(res, 'Password or OTP is required for student login', 400);
       }
 
-      const [subs] = await db.query(
-        `SELECT ss.*, p.name as plan_name, p.quota_kg, p.payg_rate_per_kg 
-         FROM student_subscriptions ss 
-         JOIN subscription_plans p ON ss.plan_id = p.id 
-         WHERE ss.student_id = ? AND ss.status = 'ACTIVE' 
-         ORDER BY ss.created_at DESC LIMIT 1`,
-        [student.id]
-      );
-
       const token = generateToken({
         id: student.id,
         phone: student.phone,
@@ -134,25 +110,10 @@ const unifiedLogin = async (req, res) => {
         isStudent: true,
       });
 
-      const sidebarModules = getSidebarModulesForUser('STUDENT', []);
-
       return successResponse(res, 'Student logged in successfully', {
         role: 'STUDENT',
         token,
         sessionExpiryInfo: 'Session automatically expires after inactivity window (default 2 hours)',
-        permissions: DEFAULT_ROLE_PERMISSIONS.STUDENT,
-        sidebarModules,
-        student: {
-          id: student.id,
-          phone: student.phone,
-          fullName: student.full_name,
-          gender: student.gender,
-          studentIdCard: student.student_id_card,
-          campusName: student.campus_name,
-          status: student.status,
-          permanentQr: student.permanent_qr,
-          activeSubscription: subs[0] || null,
-        },
       });
     }
 
@@ -171,7 +132,7 @@ const getMe = async (req, res) => {
   try {
     if (req.isStudent) {
       const student = req.student;
-      const sidebarModules = getSidebarModulesForUser('STUDENT', []);
+      const sidebarModules = await getSidebarModulesForUser('STUDENT', []);
       return successResponse(res, 'Current student profile fetched successfully', {
         role: 'STUDENT',
         permissions: DEFAULT_ROLE_PERMISSIONS.STUDENT,
@@ -182,7 +143,7 @@ const getMe = async (req, res) => {
 
     const user = req.user;
     const permissionModules = getUserPermissionsList(user);
-    const sidebarModules = getSidebarModulesForUser(user.role, permissionModules);
+    const sidebarModules = await getSidebarModulesForUser(user.role, permissionModules);
 
     const [userOutlets] = await db.query(
       `SELECT o.* FROM outlets o JOIN user_outlets uo ON o.id = uo.outlet_id WHERE uo.user_id = ?`,

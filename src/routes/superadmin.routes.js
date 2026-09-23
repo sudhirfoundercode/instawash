@@ -4,6 +4,10 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth.middle
 const { logAuditAction } = require('../middleware/audit.middleware');
 const {
   getDashboardStats,
+  createRole,
+  listRoles,
+  updateRole,
+  deleteRole,
   getAllPermissions,
   getUserPermissions,
   updateUserPermissions,
@@ -33,7 +37,13 @@ router.use(authenticateToken, authorizeRoles('SUPER_ADMIN'));
 
 router.get('/dashboard', getDashboardStats);
 
-// Dynamic Permissions Registry & User Permission Toggles
+// Dynamic Roles Management
+router.post('/roles', logAuditAction('CREATE_ROLE'), createRole);
+router.get('/roles', listRoles);
+router.put('/roles/:id', logAuditAction('UPDATE_ROLE'), updateRole);
+router.delete('/roles/:id', logAuditAction('DELETE_ROLE'), deleteRole);
+
+// Permissions Master List & User Permission Toggles
 router.get('/permissions', getAllPermissions);
 router.get('/users/:userId/permissions', getUserPermissions);
 router.put('/users/:userId/permissions', logAuditAction('UPDATE_USER_PERMISSIONS'), updateUserPermissions);

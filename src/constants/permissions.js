@@ -1,42 +1,33 @@
 /**
- * Instawash Campus Ecosystem - Simple Clean System Modules & Permissions
+ * Instawash Campus Ecosystem - 17 Core System Modules & Permissions
+ * Directly matching the UI Sidebar Design
  */
 const PERMISSIONS = {
   DASHBOARD: 'dashboard',
-  MANAGERS: 'managers',
-  RECEPTIONISTS: 'receptionists',
-  ACCOUNTANTS: 'accountants',
   CAMPUSES: 'campuses',
-  PLANS: 'plans',
-  ORDERS: 'orders',
+  OUTLETS: 'outlets',
   STUDENTS: 'students',
+  SUBSCRIPTIONS: 'subscriptions',
+  ORDERS: 'orders',
+  MANAGERS: 'managers',
+  ACCOUNTANTS: 'accountants',
+  ROLES: 'roles',
   MACHINES: 'machines',
-  EXPENSES: 'expenses',
-  COLLECTIONS: 'collections',
+  COMPLAINTS: 'complaints',
+  PAYMENTS: 'payments',
+  RECONCILIATION: 'reconciliation',
   REPORTS: 'reports',
-  NOTICES: 'notices',
+  NOTIFICATIONS: 'notifications',
+  AUDIT_LOGS: 'audit_logs',
+  SETTINGS: 'settings',
 };
 
 const DEFAULT_ROLE_PERMISSIONS = {
-  SUPER_ADMIN: [
-    'dashboard',
-    'managers',
-    'receptionists',
-    'accountants',
-    'campuses',
-    'plans',
-    'orders',
-    'students',
-    'machines',
-    'expenses',
-    'collections',
-    'reports',
-    'notices',
-  ],
-  OUTLET_MANAGER: ['dashboard', 'receptionists', 'orders', 'machines', 'reports'],
-  RECEPTIONIST: ['orders', 'students'],
-  ACCOUNTANT: ['dashboard', 'plans', 'expenses', 'collections', 'reports'],
-  STUDENT: ['dashboard', 'plans', 'orders'],
+  SUPER_ADMIN: Object.values(PERMISSIONS),
+  OUTLET_MANAGER: ['dashboard', 'receptionists', 'orders', 'machines', 'reports', 'notifications'],
+  RECEPTIONIST: ['orders', 'students', 'notifications'],
+  ACCOUNTANT: ['dashboard', 'subscriptions', 'payments', 'reconciliation', 'reports', 'notifications'],
+  STUDENT: ['dashboard', 'subscriptions', 'orders', 'complaints', 'notifications'],
 };
 
 module.exports = {

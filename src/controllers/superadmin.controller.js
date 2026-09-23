@@ -40,12 +40,102 @@ const getDashboardStats = async (req, res) => {
 };
 
 /**
- * Roles & Permissions APIs
+ * Custom Roles Management (Super Admin can create any number of custom roles)
+ */
+const createRole = async (req, res) => {
+  try {
+    const { id, name, description, permissions } = req.body;
+    if (!name) {
+      return errorResponse(res, 'Role name is required', 400);
+    }
+
+    const roleId = (id || name.toLowerCase().replace(/\s+/g, '_')).trim();
+    const rolePerms = permissions && Array.isArray(permissions) ? JSON.stringify(permissions) : JSON.stringify([]);
+
+    await db.query(
+      `INSERT INTO roles (id, name, description, permissions) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), permissions = VALUES(permissions)`,
+      [roleId, name, description || null, rolePerms]
+    );
+
+    return successResponse(res, 'Custom Role created/updated successfully', {
+      id: roleId,
+      name,
+      description,
+      permissions: Array.isArray(permissions) ? permissions : [],
+    }, 201);
+  } catch (error) {
+    console.error('Create Role Error:', error);
+    return errorResponse(res, 'Failed to create role', 500);
+  }
+};
+
+const listRoles = async (req, res) => {
+  try {
+    const [roles] = await db.query(`SELECT * FROM roles ORDER BY created_at DESC`);
+    for (const r of roles) {
+      try {
+        r.permissions = r.permissions ? JSON.parse(r.permissions) : [];
+      } catch (e) {
+        r.permissions = [];
+      }
+    }
+    return successResponse(res, 'Roles fetched successfully', roles);
+  } catch (error) {
+    return errorResponse(res, 'Failed to fetch roles', 500);
+  }
+};
+
+const updateRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, permissions } = req.body;
+
+    const updates = [];
+    const params = [];
+
+    if (name) { updates.push('name = ?'); params.push(name); }
+    if (description !== undefined) { updates.push('description = ?'); params.push(description); }
+    if (permissions && Array.isArray(permissions)) {
+      updates.push('permissions = ?');
+      params.push(JSON.stringify(permissions));
+    }
+
+    if (updates.length > 0) {
+      params.push(id);
+      await db.query(`UPDATE roles SET ${updates.join(', ')} WHERE id = ?`, params);
+    }
+
+    return successResponse(res, 'Role updated successfully');
+  } catch (error) {
+    return errorResponse(res, 'Failed to update role', 500);
+  }
+};
+
+const deleteRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query(`DELETE FROM roles WHERE id = ?`, [id]);
+    return successResponse(res, 'Role deleted successfully');
+  } catch (error) {
+    return errorResponse(res, 'Failed to delete role', 500);
+  }
+};
+
+/**
+ * Roles & Permissions Master List API
  */
 const getAllPermissions = async (req, res) => {
   try {
     const [roles] = await db.query(`SELECT * FROM roles`);
     const [permissions] = await db.query(`SELECT * FROM permissions`);
+
+    for (const r of roles) {
+      try {
+        r.permissions = r.permissions ? JSON.parse(r.permissions) : [];
+      } catch (e) {
+        r.permissions = [];
+      }
+    }
 
     return successResponse(res, 'Roles & Permissions fetched successfully', {
       roles,
@@ -489,6 +579,10 @@ const createNotice = async (req, res) => {
 
 module.exports = {
   getDashboardStats,
+  createRole,
+  listRoles,
+  updateRole,
+  deleteRole,
   getAllPermissions,
   getUserPermissions,
   updateUserPermissions,

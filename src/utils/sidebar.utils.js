@@ -1,54 +1,68 @@
+const db = require('../config/db');
+
 /**
- * Instawash Simple Dynamic Sidebar Modules Registry
+ * Fallback MODULE_DEFINITIONS (in case DB query fails)
  */
 const MODULE_DEFINITIONS = [
-  // Super Admin Modules
-  { id: 'dashboard', title: 'HQ Overview', path: '/superadmin/dashboard', icon: 'bar-chart-2', module: 'dashboard', role: 'SUPER_ADMIN' },
-  { id: 'managers', title: 'Outlet Managers', path: '/superadmin/managers', icon: 'users', module: 'managers', role: 'SUPER_ADMIN' },
-  { id: 'receptionists', title: 'Receptionists', path: '/superadmin/receptionists', icon: 'user-plus', module: 'receptionists', role: 'SUPER_ADMIN' },
-  { id: 'accountants', title: 'Accountants', path: '/superadmin/accountants', icon: 'user-check', module: 'accountants', role: 'SUPER_ADMIN' },
-  { id: 'campuses', title: 'Campuses & Outlets', path: '/superadmin/campuses', icon: 'grid', module: 'campuses', role: 'SUPER_ADMIN' },
-  { id: 'plans', title: 'Plans & Pricing', path: '/superadmin/plans', icon: 'layers', module: 'plans', role: 'SUPER_ADMIN' },
-  { id: 'reports', title: 'Network Reports', path: '/superadmin/reports', icon: 'pie-chart', module: 'reports', role: 'SUPER_ADMIN' },
-  { id: 'notices', title: 'Broadcast Notices', path: '/superadmin/notices', icon: 'bell', module: 'notices', role: 'SUPER_ADMIN' },
-
-  // Outlet Manager Modules
-  { id: 'dashboard', title: 'Outlet Overview', path: '/manager/dashboard', icon: 'activity', module: 'dashboard', role: 'OUTLET_MANAGER' },
-  { id: 'receptionists', title: 'Manage Staff', path: '/manager/receptionists', icon: 'users', module: 'receptionists', role: 'OUTLET_MANAGER' },
-  { id: 'orders', title: 'Orders & Workflows', path: '/manager/orders', icon: 'alert-triangle', module: 'orders', role: 'OUTLET_MANAGER' },
-  { id: 'machines', title: 'Washing Machines', path: '/manager/machines', icon: 'cpu', module: 'machines', role: 'OUTLET_MANAGER' },
-  { id: 'reports', title: 'Volume & Reports', path: '/manager/reports', icon: 'trending-up', module: 'reports', role: 'OUTLET_MANAGER' },
-
-  // Receptionist Modules
-  { id: 'students', title: 'Search & Register Student', path: '/receptionist/students', icon: 'users', module: 'students', role: 'RECEPTIONIST' },
-  { id: 'orders', title: 'Laundry Intake & Status', path: '/receptionist/orders', icon: 'plus-circle', module: 'orders', role: 'RECEPTIONIST' },
-
-  // Accountant Modules
-  { id: 'dashboard', title: 'Billing Overview', path: '/accountant/dashboard', icon: 'dollar-sign', module: 'dashboard', role: 'ACCOUNTANT' },
-  { id: 'plans', title: 'Plan Confirmations', path: '/accountant/subscriptions', icon: 'check-square', module: 'plans', role: 'ACCOUNTANT' },
-  { id: 'expenses', title: 'Outlet Expenses', path: '/accountant/expenses', icon: 'credit-card', module: 'expenses', role: 'ACCOUNTANT' },
-  { id: 'collections', title: 'Daily Reconciliation', path: '/accountant/collections', icon: 'archive', module: 'collections', role: 'ACCOUNTANT' },
-  { id: 'reports', title: 'Net P&L Statement', path: '/accountant/reports', icon: 'book-open', module: 'reports', role: 'ACCOUNTANT' },
-];
-
-const STUDENT_SIDEBAR = [
-  { id: 'dashboard', title: 'My Dashboard', path: '/student/dashboard', icon: 'home' },
-  { id: 'plans', title: 'Subscription Plans', path: '/student/plans', icon: 'package' },
-  { id: 'orders', title: 'Order History & Track', path: '/student/orders', icon: 'truck' },
+  { id: 'dashboard', title: 'Dashboard', path: '/api/superadmin/dashboard', icon: 'grid', module: 'dashboard' },
+  { id: 'campuses', title: 'Campuses', path: '/api/superadmin/campuses', icon: 'building', module: 'campuses' },
+  { id: 'outlets', title: 'Outlets', path: '/api/superadmin/outlets', icon: 'store', module: 'outlets' },
+  { id: 'students', title: 'Students', path: '/api/receptionist/students', icon: 'users', module: 'students' },
+  { id: 'subscriptions', title: 'Subscriptions', path: '/api/superadmin/subscriptions', icon: 'layers', module: 'subscriptions' },
+  { id: 'orders', title: 'Orders', path: '/api/manager/orders', icon: 'file-text', module: 'orders' },
+  { id: 'managers', title: 'Outlet Managers', path: '/api/superadmin/managers', icon: 'user-check', module: 'managers' },
+  { id: 'accountants', title: 'Accountants', path: '/api/superadmin/accountants', icon: 'dollar-sign', module: 'accountants' },
+  { id: 'roles', title: 'Roles & Permissions', path: '/api/superadmin/roles', icon: 'shield', module: 'roles' },
+  { id: 'machines', title: 'Machines', path: '/api/manager/machines', icon: 'cpu', module: 'machines' },
+  { id: 'complaints', title: 'Complaints', path: '/api/superadmin/complaints', icon: 'alert-circle', module: 'complaints' },
+  { id: 'payments', title: 'Payments', path: '/api/accountant/payments', icon: 'credit-card', module: 'payments' },
+  { id: 'reconciliation', title: 'Reconciliation', path: '/api/accountant/reconciliation', icon: 'archive', module: 'reconciliation' },
+  { id: 'reports', title: 'Reports', path: '/api/manager/reports', icon: 'bar-chart-2', module: 'reports' },
+  { id: 'notifications', title: 'Notifications', path: '/api/superadmin/notices', icon: 'bell', module: 'notifications' },
+  { id: 'audit_logs', title: 'Audit Logs', path: '/api/superadmin/audit-logs', icon: 'clipboard', module: 'audit_logs' },
+  { id: 'settings', title: 'Settings', path: '/api/superadmin/settings', icon: 'settings', module: 'settings' },
 ];
 
 /**
- * Filter sidebar items by user role & simple allowed modules list
+ * Dynamically fetch sidebar modules from database permissions table
+ * Filtered by user's assigned permission modules
  */
-function getSidebarModulesForUser(role, allowedModules = []) {
-  if (role === 'STUDENT') return STUDENT_SIDEBAR;
-  if (role === 'SUPER_ADMIN') return MODULE_DEFINITIONS.filter(m => m.role === 'SUPER_ADMIN');
+async function getSidebarModulesForUser(role, allowedModules = []) {
+  try {
+    const [rows] = await db.query(
+      `SELECT id, name, title, path, icon, sort_order, description FROM permissions ORDER BY sort_order ASC`
+    );
 
-  return MODULE_DEFINITIONS.filter(m => m.role === role && allowedModules.includes(m.module));
+    let modulesList = [];
+
+    if (rows && rows.length > 0) {
+      modulesList = rows.map(r => ({
+        id: r.id,
+        title: r.title || r.name,
+        path: r.path || `/${r.id}`,
+        icon: r.icon || 'grid',
+        module: r.id,
+        description: r.description
+      }));
+    } else {
+      modulesList = MODULE_DEFINITIONS;
+    }
+
+    if (role === 'SUPER_ADMIN' || allowedModules.includes('ALL_ACCESS')) {
+      return modulesList;
+    }
+
+    return modulesList.filter(m => allowedModules.includes(m.module));
+  } catch (error) {
+    console.error('Error fetching sidebar modules from DB:', error);
+    if (role === 'SUPER_ADMIN' || allowedModules.includes('ALL_ACCESS')) {
+      return MODULE_DEFINITIONS;
+    }
+    return MODULE_DEFINITIONS.filter(m => allowedModules.includes(m.module));
+  }
 }
 
 module.exports = {
   MODULE_DEFINITIONS,
-  STUDENT_SIDEBAR,
   getSidebarModulesForUser,
 };
