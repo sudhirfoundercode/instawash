@@ -218,7 +218,7 @@ const updateOrderStatus = async (req, res) => {
 };
 
 /**
- * Register New Student by Receptionist / Staff
+ * Register or Update Student by Receptionist / Staff (Sets status to ACTIVE_SUBSCRIBED)
  */
 const registerStudentByReceptionist = async (req, res) => {
   try {
@@ -227,59 +227,148 @@ const registerStudentByReceptionist = async (req, res) => {
     const {
       phone,
       mobileNumber,
+      mobile,
+      mobile_no,
+      phoneNumber,
+      phone_number,
       fullName,
+      full_name,
+      name,
       gender,
       campusId,
+      campus_id,
       studentIdCard,
+      student_id_card,
+      rollNumber,
+      roll_number,
+      studentId,
       gradYear,
+      grad_year,
       course,
       hostelName,
+      hostel_name,
       roomNumber,
+      room_number,
       email,
       password,
     } = req.body;
 
-    const contactPhone = phone || mobileNumber;
+    const contactPhone = phone || mobileNumber || mobile || mobile_no || phoneNumber || phone_number;
+    const studentName = fullName || full_name || name;
+    const idCard = studentIdCard || student_id_card || rollNumber || roll_number || studentId;
+    const targetCampusId = campusId || campus_id || null;
+    const targetGradYear = (gradYear || grad_year) ? parseInt(gradYear || grad_year) : null;
+    const targetCourse = course || null;
+    const targetHostel = hostelName || hostel_name || null;
+    const targetRoom = roomNumber || room_number || null;
+    const targetEmail = email || null;
+    const targetGender = (gender || 'MALE').toUpperCase();
 
-    if (!contactPhone || !fullName || !studentIdCard) {
+    if (!contactPhone || !studentName || !idCard) {
       return errorResponse(res, 'Phone number, Full Name, and Student ID / Roll Number are required', 400);
     }
 
-    const [existing] = await db.query(`SELECT id FROM students WHERE phone = ? OR student_id_card = ?`, [contactPhone, studentIdCard]);
-    if (existing.length > 0) {
-      return errorResponse(res, 'A student account with this phone number or roll number already exists', 400);
+    // 1. Check if student with this mobile/phone number already exists
+    const [existingStudents] = await db.query(`SELECT * FROM students WHERE phone = ?`, [contactPhone]);
+
+    if (existingStudents.length > 0) {
+      const existingStudent = existingStudents[0];
+      let hashedPassword = existingStudent.password;
+      if (password) {
+        hashedPassword = await hashPassword(password);
+      }
+
+      // Update existing student record and set status to ACTIVE_SUBSCRIBED
+      await db.query(
+        `UPDATE students SET 
+          full_name = ?, 
+          gender = ?, 
+          student_id_card = ?, 
+          campus_id = COALESCE(?, campus_id),
+          grad_year = COALESCE(?, grad_year),
+          course = COALESCE(?, course),
+          hostel_name = COALESCE(?, hostel_name),
+          room_number = COALESCE(?, room_number),
+          email = COALESCE(?, email),
+          password = ?,
+          status = 'ACTIVE_SUBSCRIBED'
+        WHERE id = ?`,
+        [
+          studentName,
+          targetGender,
+          idCard,
+          targetCampusId,
+          targetGradYear,
+          targetCourse,
+          targetHostel,
+          targetRoom,
+          targetEmail,
+          hashedPassword,
+          existingStudent.id,
+        ]
+      );
+
+      const [updatedRows] = await db.query(
+        `SELECT s.*, c.name as campus_name FROM students s LEFT JOIN campuses c ON s.campus_id = c.id WHERE s.id = ?`,
+        [existingStudent.id]
+      );
+      const updatedStudent = updatedRows[0];
+
+      return successResponse(res, 'Existing student profile updated successfully by Receptionist', {
+        student: updatedStudent,
+        isUpdated: true,
+        id: updatedStudent.id,
+        phone: updatedStudent.phone,
+        fullName: updatedStudent.full_name,
+        permanentQr: updatedStudent.permanent_qr,
+        status: 'ACTIVE_SUBSCRIBED',
+      }, 200);
+    }
+
+    // 2. Mobile number does not exist -> Create new student record with ACTIVE_SUBSCRIBED status
+    const [existingCard] = await db.query(`SELECT id FROM students WHERE student_id_card = ?`, [idCard]);
+    if (existingCard.length > 0) {
+      return errorResponse(res, 'A student account with this Student ID / Roll Number already exists', 400);
     }
 
     const hashedPassword = await hashPassword(password || 'Student@123');
-    const studentId = generateId('stu');
-    const permanentQr = generatePermanentQrCode(studentId);
+    const newStudentId = generateId('stu');
+    const permanentQr = generatePermanentQrCode(newStudentId);
 
     await db.query(
       `INSERT INTO students (id, phone, full_name, gender, campus_id, student_id_card, grad_year, course, hostel_name, room_number, email, password, permanent_qr, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'REGISTERED_INACTIVE')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE_SUBSCRIBED')`,
       [
-        studentId,
+        newStudentId,
         contactPhone,
-        fullName,
-        (gender || 'MALE').toUpperCase(),
-        campusId || null,
-        studentIdCard,
-        gradYear ? parseInt(gradYear) : null,
-        course || null,
-        hostelName || null,
-        roomNumber || null,
-        email || null,
+        studentName,
+        targetGender,
+        targetCampusId,
+        idCard,
+        targetGradYear,
+        targetCourse,
+        targetHostel,
+        targetRoom,
+        targetEmail,
         hashedPassword,
         permanentQr,
       ]
     );
 
+    const [newRows] = await db.query(
+      `SELECT s.*, c.name as campus_name FROM students s LEFT JOIN campuses c ON s.campus_id = c.id WHERE s.id = ?`,
+      [newStudentId]
+    );
+    const newStudent = newRows[0];
+
     return successResponse(res, 'Student registered successfully by Receptionist', {
-      id: studentId,
+      student: newStudent,
+      isCreated: true,
+      id: newStudentId,
       phone: contactPhone,
-      fullName,
+      fullName: studentName,
       permanentQr,
-      status: 'REGISTERED_INACTIVE',
+      status: 'ACTIVE_SUBSCRIBED',
     }, 201);
   } catch (error) {
     console.error('Receptionist Student Register Error:', error);

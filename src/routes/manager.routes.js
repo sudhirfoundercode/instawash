@@ -15,9 +15,11 @@ const {
   updateMachineStatus,
   getOperationalReports,
 } = require('../controllers/manager.controller');
+const { getMe } = require('../controllers/auth.controller');
 
 router.use(authenticateToken, authorizeRoles('SUPER_ADMIN', 'OUTLET_MANAGER'));
 
+router.get('/profile', getMe);
 router.get('/dashboard', authorizePermission('dashboard'), getOutletDashboard);
 
 // Receptionist Staff Management

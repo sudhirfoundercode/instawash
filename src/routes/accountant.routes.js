@@ -11,9 +11,11 @@ const {
   createExpense,
   getFinancialStatements,
 } = require('../controllers/accountant.controller');
+const { getMe } = require('../controllers/auth.controller');
 
 router.use(authenticateToken, authorizeRoles('SUPER_ADMIN', 'ACCOUNTANT'));
 
+router.get('/profile', getMe);
 router.get('/billing-dashboard', authorizePermission('dashboard'), getBillingDashboard);
 router.post('/subscriptions/confirm-payment', authorizePermission('plans'), logAuditAction('CONFIRM_SUBSCRIPTION_PAYMENT'), confirmSubscriptionPayment);
 router.post('/payg/calculate', authorizePermission('plans'), enforceDiscountCeiling, calculatePaygInvoice);

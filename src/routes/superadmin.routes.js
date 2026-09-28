@@ -31,10 +31,12 @@ const {
   getAuditLogs,
   createNotice,
 } = require('../controllers/superadmin.controller');
+const { getMe } = require('../controllers/auth.controller');
 
 // Require Super Admin role for all routes
 router.use(authenticateToken, authorizeRoles('SUPER_ADMIN'));
 
+router.get('/profile', getMe);
 router.get('/dashboard', getDashboardStats);
 
 // Dynamic Roles Management

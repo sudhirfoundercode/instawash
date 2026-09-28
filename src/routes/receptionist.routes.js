@@ -10,9 +10,11 @@ const {
   updateOrderStatus,
   getDailyActivityLog,
 } = require('../controllers/receptionist.controller');
+const { getMe } = require('../controllers/auth.controller');
 
 router.use(authenticateToken, authorizeRoles('SUPER_ADMIN', 'OUTLET_MANAGER', 'RECEPTIONIST'));
 
+router.get('/profile', getMe);
 router.get('/students/search', authorizePermission('students'), searchStudent);
 router.get('/students/qr/:qrToken', authorizePermission('students'), getStudentByQr);
 router.post('/students', authorizePermission('students'), logAuditAction('REGISTER_STUDENT'), registerStudentByReceptionist);

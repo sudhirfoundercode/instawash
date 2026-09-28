@@ -8,6 +8,7 @@ router.post('/login', unifiedLogin);
 
 // Current User & Sidebar Modules Profile API
 router.get('/me', authenticateToken, getMe);
+router.get('/profile', authenticateToken, getMe);
 
 // Manual Logout API for ALL roles
 router.post('/logout', authenticateToken, logout);

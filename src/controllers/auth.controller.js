@@ -150,23 +150,41 @@ const getMe = async (req, res) => {
       [user.id]
     );
 
+    const personalData = {
+      id: user.id,
+      staffId: user.staff_id,
+      staff_id: user.staff_id,
+      name: user.name,
+      fullName: user.name,
+      full_name: user.name,
+      email: user.email || '',
+      phone: user.phone || '',
+      mobile: user.phone || '',
+      mobileNumber: user.phone || '',
+      role: user.role,
+      roleId: user.role_id || user.role,
+      role_id: user.role_id || user.role,
+      section: user.section || null,
+      shift: user.shift || null,
+      maxDiscountPercent: user.max_discount_percent || 0,
+      max_discount_percent: user.max_discount_percent || 0,
+      isActive: Boolean(user.is_active),
+      is_active: Boolean(user.is_active),
+      createdAt: user.created_at,
+      created_at: user.created_at,
+      permissions: permissionModules,
+      outlets: userOutlets,
+      outlet: userOutlets[0] || null,
+    };
+
     return successResponse(res, 'Current user profile fetched successfully', {
       role: user.role,
       permissions: permissionModules,
       sidebarModules,
-      user: {
-        id: user.id,
-        staffId: user.staff_id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        section: user.section,
-        shift: user.shift,
-        maxDiscountPercent: user.max_discount_percent,
-        permissions: permissionModules,
-        outlets: userOutlets,
-      },
+      user: personalData,
+      profile: personalData,
+      data: personalData,
+      ...personalData,
     });
   } catch (error) {
     console.error('Get Me Error:', error);
@@ -214,6 +232,7 @@ const studentOtpSend = async (req, res) => {
 module.exports = {
   unifiedLogin,
   getMe,
+  getProfile: getMe,
   logout,
   studentOtpSend,
 };
