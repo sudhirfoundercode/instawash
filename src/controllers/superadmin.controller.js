@@ -6,7 +6,7 @@ const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString
 
 /**
  * Super Admin Dashboard Overview
- * GET /api/superadmin/dashboard
+ * GET /api/superadmin/dashboards
  */
 const getDashboardStats = async (req, res) => {
   try {

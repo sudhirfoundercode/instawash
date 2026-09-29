@@ -6,7 +6,7 @@ const { getSidebarModulesForUser } = require('../utils/sidebar.utils');
 const { DEFAULT_ROLE_PERMISSIONS } = require('../constants/permissions');
 
 /**
- * Extract simple permissions array for a user
+ * Extract simple permissions array for a users
  */
 const getUserPermissionsList = (user) => {
   if (user.role === 'SUPER_ADMIN') {
