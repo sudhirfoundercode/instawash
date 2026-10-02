@@ -6,7 +6,7 @@ const { successResponse, errorResponse } = require('../utils/response.utils');
 const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
 /**
- * Student Registration
+ * Student Registrations
  */
 const studentRegister = async (req, res) => {
   try {
