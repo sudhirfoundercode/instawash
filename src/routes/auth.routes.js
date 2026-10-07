@@ -3,7 +3,7 @@ const router = express.Router();
 const { unifiedLogin, getMe, logout, studentOtpSend } = require('../controllers/auth.controller');
 const { authenticateToken } = require('../middleware/auth.middleware');
 
-// Unified Login API for ALL role
+// Unified Login API for ALL roles
 router.post('/login', unifiedLogin);
 
 // Current User & Sidebar Modules Profile API
