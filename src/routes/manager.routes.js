@@ -32,7 +32,7 @@ router.delete('/receptionists/:id', authorizePermission('receptionists'), logAud
 router.get('/flagged-orders', authorizePermission('orders'), getFlaggedOrders);
 router.put('/flagged-orders/:flagId/resolve', authorizePermission('orders'), logAuditAction('RESOLVE_FLAGGED_ORDER'), resolveFlaggedOrder);
 
-// Machines
+// Machine
 router.post('/machines', authorizePermission('machines'), logAuditAction('CREATE_MACHINE'), createMachine);
 router.get('/machines', authorizePermission('machines'), listMachines);
 router.put('/machines/:id/status', authorizePermission('machines'), logAuditAction('UPDATE_MACHINE_STATUS'), updateMachineStatus);
