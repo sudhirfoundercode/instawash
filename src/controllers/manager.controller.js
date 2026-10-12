@@ -12,7 +12,7 @@ const getManagerOutletId = (req) => {
 
 /**
  * Outlet Dashboard
- * GET /api/manager/dashboards
+ * GET /api/manager/dashboard
  */
 const getOutletDashboard = async (req, res) => {
   try {
