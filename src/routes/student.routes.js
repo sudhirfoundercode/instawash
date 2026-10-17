@@ -16,7 +16,7 @@ const {
   getNotices,
 } = require('../controllers/student.controller');
 
-// Public registration endpoint
+// Public registration endpointa
 router.post('/register', studentRegister);
 
 // Authenticated Student routes
