@@ -28,7 +28,7 @@ router.get('/receptionists', authorizePermission('receptionists'), listReception
 router.put('/receptionists/:id', authorizePermission('receptionists'), logAuditAction('UPDATE_RECEPTIONIST'), updateReceptionist);
 router.delete('/receptionists/:id', authorizePermission('receptionists'), logAuditAction('DELETE_RECEPTIONIST'), deleteReceptionist);
 
-// Flagged Orders
+// Flagged Order
 router.get('/flagged-orders', authorizePermission('orders'), getFlaggedOrders);
 router.put('/flagged-orders/:flagId/resolve', authorizePermission('orders'), logAuditAction('RESOLVE_FLAGGED_ORDER'), resolveFlaggedOrder);
 
