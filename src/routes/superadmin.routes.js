@@ -33,7 +33,7 @@ const {
 } = require('../controllers/superadmin.controller');
 const { getMe } = require('../controllers/auth.controller');
 
-// Require Super Admin role for all route
+// Require Super Admin role for all routes
 router.use(authenticateToken, authorizeRoles('SUPER_ADMIN'));
 
 router.get('/profile', getMe);

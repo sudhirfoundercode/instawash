@@ -19,7 +19,7 @@ const {
 // Public registration endpointa
 router.post('/register', studentRegister);
 
-// Authenticated Student routes
+// Authenticated Student route
 router.use(authenticateToken, authorizeRoles('STUDENT'));
 
 router.post('/upload-id-card', upload.single('idCardPhoto'), uploadIdCardPhoto);
