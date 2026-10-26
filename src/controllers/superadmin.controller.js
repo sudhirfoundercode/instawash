@@ -5,8 +5,7 @@ const { successResponse, errorResponse } = require('../utils/response.utils');
 const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
 /**
- * Super Admin Dashboard Overview
- * GET /api/superadmin/dashboard
+ * Super Admin Dashboard Overviews
  */
 const getDashboardStats = async (req, res) => {
   try {
