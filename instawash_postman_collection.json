@@ -89,15 +89,27 @@
           }
         },
         {
-          "name": "Unified Login - Student (Mobile OTP)",
+          "name": "Send Student OTP (IndoPay Gateway)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identifier\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+              "raw": "{\n  \"phone\": \"9876543210\"\n}"
             },
-            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+            "url": { "raw": "{{baseUrl}}/auth/send-otp", "host": ["{{baseUrl}}"], "path": ["auth", "send-otp"] }
+          }
+        },
+        {
+          "name": "Verify Student OTP & Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"otp\": \"111111\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/verify-otp", "host": ["{{baseUrl}}"], "path": ["auth", "verify-otp"] }
           }
         },
         {
@@ -132,6 +144,44 @@
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
             "url": { "raw": "{{baseUrl}}/superadmin/dashboard", "host": ["{{baseUrl}}"], "path": ["superadmin", "dashboard"] }
+          }
+        },
+        {
+          "name": "Create Custom Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"supervisor\",\n  \"name\": \"Outlet Supervisor\",\n  \"description\": \"Supervises laundry operations and machines\",\n  \"permissions\": [\"dashboard\", \"orders\", \"machines\", \"complaints\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/roles", "host": ["{{baseUrl}}"], "path": ["superadmin", "roles"] }
+          }
+        },
+        {
+          "name": "List All Custom Roles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/superadmin/roles", "host": ["{{baseUrl}}"], "path": ["superadmin", "roles"] }
+          }
+        },
+        {
+          "name": "Update Role Permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": [\"dashboard\", \"orders\", \"machines\", \"complaints\", \"notifications\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/superadmin/roles/supervisor", "host": ["{{baseUrl}}"], "path": ["superadmin", "roles", "supervisor"] }
           }
         },
         {

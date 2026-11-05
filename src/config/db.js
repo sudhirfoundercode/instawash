@@ -4,9 +4,9 @@ const path = require('path');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'instawash_db',
+  user: process.env.DB_USER || 'Instawashlaundry_db',
+  password: process.env.DB_PASSWORD || 'UgZnac_&0sC92qcv',
+  database: process.env.DB_NAME || 'Instawashlaundry_db',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

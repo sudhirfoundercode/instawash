@@ -1,19 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const { unifiedLogin, getMe, logout, studentOtpSend } = require('../controllers/auth.controller');
+const { unifiedLogin,adminLogin, getMe, logout, sendOtp, verifyOtp,Profile } = require('../controllers/auth.controller');
 const { authenticateToken } = require('../middleware/auth.middleware');
 
-// Unified Login API for ALL role
+// Unified Login API for ALL roles
 router.post('/login', unifiedLogin);
+router.post('/admin_login', adminLogin);
 
-// Current User & Sidebar Modules Profile API
-router.get('/me', authenticateToken, getMe);
-router.get('/profile', authenticateToken, getMe);
+// Current User & Sidebar Modules 
+router.get('/sidebar_module', authenticateToken, getMe);
+// Current User  Profile API
+router.get('/profile', authenticateToken, Profile);
+
 
 // Manual Logout API for ALL roles
 router.post('/logout', authenticateToken, logout);
 
-// Send OTP helper
-router.post('/send-otp', studentOtpSend);
+// Student OTP Send & Verify APIs
+router.post('/send-otp', sendOtp);
+router.post('/verify-otp', verifyOtp);
 
 module.exports = router;

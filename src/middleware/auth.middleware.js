@@ -22,9 +22,19 @@ const authenticateToken = async (req, res, next) => {
   }
 
   try {
-    if (decoded.isStudent || decoded.role === 'STUDENT') {
+    // =====================================================
+    // STUDENT or NON_STUDENT  -> students table
+    // =====================================================
+    if (
+      decoded.isStudent ||
+      decoded.role === 'STUDENT' ||
+      decoded.role === 'NON_STUDENT'
+    ) {
       const [students] = await db.query(
-        'SELECT s.*, c.name as campus_name FROM students s LEFT JOIN campuses c ON s.campus_id = c.id WHERE s.id = ?',
+        `SELECT s.*, c.name AS campus_name
+         FROM students s
+         LEFT JOIN campuses c ON s.campus_id = c.id
+         WHERE s.id = ?`,
         [decoded.id]
       );
 
@@ -35,20 +45,32 @@ const authenticateToken = async (req, res, next) => {
       req.student = students[0];
       req.isStudent = true;
       req.token = token;
-    } else {
+    }
+    // =====================================================
+    // STAFF / ADMIN / SUPER_ADMIN -> users table
+    // =====================================================
+    else {
       const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.id]);
 
-      if (users.length === 0 || !users[0].is_active) {
-        return errorResponse(res, 'Staff account disabled or not found', 401);
+      // ✅ is_active check hata diya — sirf existence check
+      if (users.length === 0) {
+        return errorResponse(res, 'account not found', 401);
       }
 
       const user = users[0];
-      const [userOutlets] = await db.query('SELECT outlet_id FROM user_outlets WHERE user_id = ?', [user.id]);
+      const [userOutlets] = await db.query(
+        'SELECT outlet_id FROM user_outlets WHERE user_id = ?',
+        [user.id]
+      );
 
       // Parse user permissions JSON or fallback to role defaults
       let permissionCodes = [];
       try {
-        permissionCodes = user.permissions ? (typeof user.permissions === 'string' ? JSON.parse(user.permissions) : user.permissions) : [];
+        permissionCodes = user.permissions
+          ? (typeof user.permissions === 'string'
+              ? JSON.parse(user.permissions)
+              : user.permissions)
+          : [];
       } catch (e) {
         permissionCodes = [];
       }
@@ -70,15 +92,44 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+/**
+ * ✅ Naya Middleware: Sirf active staff ko allow karta hai.
+ * Profile route pe mat lagana — baaki sensitive routes pe lagana.
+ */
+const requireActiveStaff = (req, res, next) => {
+  // Students ko allow (agar unka apna active check hai to yahan add karo)
+  if (req.isStudent) {
+    return next();
+  }
+
+  if (!req.user) {
+    return errorResponse(res, 'User not authenticated', 401);
+  }
+
+  if (!req.user.is_active) {
+    return errorResponse(res, 'Staff account disabled or not found', 403);
+  }
+
+  next();
+};
+
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
+    // Student / Non-student
     if (req.isStudent) {
-      if (roles.includes('STUDENT')) return next();
+      if (roles.includes('STUDENT') || roles.includes('NON_STUDENT')) {
+        return next();
+      }
       return errorResponse(res, 'Access denied for student role', 403);
     }
 
+    // Staff / Admin
     if (!req.user || !roles.includes(req.user.role)) {
-      return errorResponse(res, `Access denied. Requires one of roles: ${roles.join(', ')}`, 403);
+      return errorResponse(
+        res,
+        `Access denied. Requires one of roles: ${roles.join(', ')}`,
+        403
+      );
     }
 
     next();
@@ -125,6 +176,7 @@ const enforceDiscountCeiling = (req, res, next) => {
 
 module.exports = {
   authenticateToken,
+  requireActiveStaff,      // ✅ export kiya
   authorizeRoles,
   authorizePermission,
   enforceDiscountCeiling,
